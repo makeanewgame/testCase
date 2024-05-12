@@ -1,24 +1,54 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import "./App.css";
+import AutoComplete from "./lib/AutoComplete";
+import { Character } from "./lib/Character";
 
 function App() {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [data, setData] = useState<Character[]>([]);
+
+  useEffect(() => {
+    if (searchValue !== "") {
+      setLoading(true);
+
+      //setTimeout to simulate a delay in the search
+      setTimeout(() => {
+        fetch(`https://rickandmortyapi.com/api/character/?name=${searchValue}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if (!data.error) {
+              const characters: Character[] = data?.results.map((item: any) => {
+                return {
+                  name: item.name,
+                  image: item.image,
+                  episode: item.episode.length,
+                };
+              });
+              setData(characters);
+              setLoading(false);
+            } else {
+              setData([]);
+              setLoading(false);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            setLoading(false);
+          });
+      }, 500);
+    } else {
+      setData([]);
+    }
+  }, [searchValue]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <AutoComplete
+        list={data}
+        setSearchValue={setSearchValue}
+        isLoading={loading}
+      />
     </div>
   );
 }
