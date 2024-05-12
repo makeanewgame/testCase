@@ -102,14 +102,13 @@ export default function AutoComplete(props: {
 
   // show the list when the list is not empty and the input value is not empty
   useEffect(() => {
-    if (list.length === 0 && inputValue !== "") {
-      setShowList(true);
-    } else if (list.length > 0 && inputValue !== "") {
+    if ( (list.length > 0 || list.length === 0 ) && inputValue !== "") {
       setShowList(true);
     } else {
       setShowList(false);
     }
-  }, [list, inputValue]);
+    //eslint-disable-next-line
+  }, [list]);
 
   // scroll into view when the cursor index changes
   useEffect(() => {
